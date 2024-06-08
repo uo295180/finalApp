@@ -100,4 +100,21 @@ routerBids.post("/", async (req, res) => {
     
 })
 
+routerBids.delete("/:id", async (req,res) => {
+    let id = req.params.id
+    if(id == undefined){
+        return res.status(400).json({error: "no id params"})
+    }
+    database.connect();
+    let deleted;
+    try{
+        deleted = await database.query("DELETE FROM bids WHERE id = ?", [id])
+    } catch( e ){
+        database.disconnect();
+        return res.status(400).json({ error: "error in delete bid" })
+    } 
+    database.disconnect();
+    res.json({deletedBid: true, bid: deleted})
+})
+
 module.exports = routerBids
