@@ -75,4 +75,45 @@ routerItems.post("/", async (req, res) => {
 
 })
 
+routerItems.put("/:id", async (req, res) => {
+    let id = req.params.id
+    let name = req.body.name
+    let description = req.body.description
+    let initialPrice = req.body.initialPrice
+    let errors = []
+    let dateFinnish = req.body.dateFinnish;
+
+    if(id==undefined){ errors.push({error: "No id found"})}
+    if(name==undefined){ errors.push({error: "No name found"})}
+    if(description==undefined){ errors.push({error: "No description found"})}
+    if(initialPrice==undefined){ errors.push({error: "No initial price found"})}
+    if(dateFinnish==undefined) {errors.push({error: "No date finnish found"})}
+    
+    try{
+        dateFinnish = new Date(req.body.dateFinnish)
+    } catch( e ){
+        errors.push({error: "Invalid date format"})
+    }
+
+
+    if(errors.length > 0) {
+        return res.status(400).json({errors: errors})
+    }
+
+    database.connect();
+
+    let updateItem;
+    try{
+        updateItem = await database.query(
+            "UPDATE items SET name = ?, description = ?, initialPrice = ?, dateFinnish = ? WHERE id=?",
+            [name, description,initialPrice,dateFinnish,id])
+    } catch( e ){
+        database.disconnect();
+        res.status(400).json({error: "error in update items"})
+    }
+
+    database.disconnect()
+    res.json({modified: updateItem})
+})
+
 module.exports = routerItems
