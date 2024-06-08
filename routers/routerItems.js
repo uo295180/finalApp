@@ -37,7 +37,7 @@ routerItems.post("/", async (req, res) => {
     let name = req.body.name
     let description = req.body.description
     let dateStart = new Date(Date.now());
-    let dateFinnish = req.body.dateFinnish
+    let dateFinnish = new Date(req.body.dateFinnish)
     let initialPrice = req.body.initialPrice
     let idUser = req.body.idUser
 
@@ -53,6 +53,25 @@ routerItems.post("/", async (req, res) => {
     if(parseFloat(initialPrice) < 0){
         return res.status(400).json({error: "invalid initial price"})
     }
+    if(dateFinnish < dateStart){
+        return res.status(400).json({error: "DateFinnish is previous than start date"})
+    }
+
+    database.connect();
+
+    let insertedItem;
+    try{
+        insertedItem = await database.query(
+            "INSERT INTO ITEMS (idUser,name,description,dateStart,dateFinnish,initialPrice) VALUES (?,?,?,?,?,?)"
+        , [idUser,name,description,dateStart,dateFinnish,initialPrice])
+    } catch(e){
+        database.disconnect();
+        return res.status(400).json({error: "error al insertar una puja"})
+    }
+
+    database.disconnect();
+    res.json(insertedItem)
+    
 
 })
 
