@@ -33,4 +33,27 @@ routerItems.get("/:id", async (req, res) => {
     res.json(items[0])
 })
 
+routerItems.post("/", async (req, res) => {
+    let name = req.body.name
+    let description = req.body.description
+    let dateStart = new Date(Date.now());
+    let dateFinnish = req.body.dateFinnish
+    let initialPrice = req.body.initialPrice
+    let idUser = req.body.idUser
+
+    // Validation
+
+    if(name==undefined||description==undefined||dateFinnish==undefined||initialPrice==undefined||idUser==undefined){
+        return res.status(400).json({error: "Some value is missing"})
+    }
+
+    if(isNaN(initialPrice)){
+        return res.status(400).json({error: "Some value is missing"})
+    } 
+    if(parseFloat(initialPrice) < 0){
+        return res.status(400).json({error: "invalid initial price"})
+    }
+
+})
+
 module.exports = routerItems
