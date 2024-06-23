@@ -39,7 +39,7 @@ routerItems.post("/", async (req, res) => {
     let dateStart = new Date(Date.now());
     let dateFinnish = new Date(req.body.dateFinnish)
     let initialPrice = req.body.initialPrice
-    let idUser = req.body.idUser
+    let idUser = req.infoApikey.id
 
     // Validation
 
@@ -105,8 +105,8 @@ routerItems.put("/:id", async (req, res) => {
     let updateItem;
     try{
         updateItem = await database.query(
-            "UPDATE items SET name = ?, description = ?, initialPrice = ?, dateFinnish = ? WHERE id=?",
-            [name, description,initialPrice,dateFinnish,id])
+            "UPDATE items SET name = ?, description = ?, initialPrice = ?, dateFinnish = ? WHERE id=? AND isUser = ?",
+            [name, description,initialPrice,dateFinnish,id,req.infoApikey.id])
     } catch( e ){
         database.disconnect();
         res.status(400).json({error: "error in update items"})
@@ -126,7 +126,14 @@ routerItems.delete("/:id", async (req,res) => {
     let deletedBids;
     let deletedItem;
     try{
-        deletedBids = await database.query("DELETE FROM bids WHERE idItem=?",[id])
+        let items = await database.query("SELECT * FORM items WHERE id = ? AND idUser = ?", [id, req.infoApikey.id])
+
+        if(items.length == 0){
+            database.disconnect();
+            return res.status(400).json({ error: "is not your item" })
+        }
+        
+        deletedBids = await database.query("DELETE FROM bids WHERE b.idItem=?",[id])
         deletedItem = await database.query("DELETE FROM items WHERE id=?", [id])
     } catch( e ){
         database.disconnect();

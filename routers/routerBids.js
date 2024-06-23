@@ -64,7 +64,7 @@ routerBids.get("/:id", async (req,res) => {
 
 routerBids.post("/", async (req, res) => {
     let idItem = req.body.idItem
-    let idUser = req.body.idUser
+    let idUser = req.infoApiKey.id
     let amount = req.body.amount
     let date = new Date(Date.now());
     
@@ -75,6 +75,10 @@ routerBids.post("/", async (req, res) => {
     database.connect();
 
     let items = await database.query("SELECT * FROM items WHERE id = ?", [idItem])
+    if(items.length==0){
+        database.disconnect();
+        return res.status(400).json({error: "no such item with that id"})
+    }
     if(date > items[0].dateFinnish){
         database.disconnect();
         return res.status(400).json({error: "bid is out of date"})
