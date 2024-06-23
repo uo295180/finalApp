@@ -112,7 +112,7 @@ routerBids.delete("/:id", async (req,res) => {
     database.connect();
     let deleted;
     try{
-        deleted = await database.query("DELETE FROM bids WHERE id = ?", [id])
+        deleted = await database.query("DELETE FROM bids WHERE id = ? AND userId = ?", [id, req.infoApiKey.id])
     } catch( e ){
         database.disconnect();
         return res.status(400).json({ error: "error in delete bid" })

@@ -105,7 +105,7 @@ routerItems.put("/:id", async (req, res) => {
     let updateItem;
     try{
         updateItem = await database.query(
-            "UPDATE items SET name = ?, description = ?, initialPrice = ?, dateFinnish = ? WHERE id=? AND isUser = ?",
+            "UPDATE items SET name = ?, description = ?, initialPrice = ?, dateFinnish = ? WHERE id=? AND idUser = ?",
             [name, description,initialPrice,dateFinnish,id,req.infoApikey.id])
     } catch( e ){
         database.disconnect();
