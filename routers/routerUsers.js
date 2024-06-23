@@ -93,4 +93,15 @@ routerUsers.post("/", async (req,res) => {
     
 })
 
+routerUsers.get("/disconnect", async (req, res) => {
+    let apiKey = req.query.apiKey
+    let index = activeApiKeys.indexOf(apiKey)
+    if(index != -1){
+        activeApiKeys.splice(index,1)
+        res.json({disconnected: true})
+    } else{
+        return res.status(400).json({error: "error when disconnecting"})
+    }
+})
+
 module.exports = routerUsers
